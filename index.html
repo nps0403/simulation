@@ -3,51 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>排気設備設計シミュレーター</title>
+    <title>NPS Duct Scale</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0056b3">
+    <meta name="theme-color" content="#004488">
     <link rel="apple-touch-icon" href="icon.png">
 
     <style>
         body { font-family: sans-serif; background-color: #f4f7f6; color: #333; line-height: 1.6; padding: 20px; }
         .container { max-width: 800px; margin: auto; }
         .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 5px; font-size: 1.2rem; }
+        h1 { color: #004488; text-align: center; font-size: 1.5rem; margin-bottom: 30px; }
+        h2 { color: #004488; border-bottom: 2px solid #004488; padding-bottom: 5px; font-size: 1.1rem; }
         .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;}
-        input[type="number"], select { padding: 8px; width: 120px; border: 1px solid #ccc; border-radius: 4px; }
-        .result-box { background: #e9f5ff; padding: 15px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 1.2rem; color: #0056b3;}
-        .note { font-size: 0.9em; color: #666; }
+        input[type="number"], select { padding: 8px; width: 120px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+        .result-box { background: #e9f5ff; padding: 15px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 1.1rem; color: #004488;}
+        .note { font-size: 0.85em; color: #666; display: block; margin-top: 5px; }
+        .unit { font-size: 0.8em; color: #888; margin-left: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>排気設備シミュレーター</h1>
+    <h1>NPS DUCT SCALE</h1>
 
     <div class="card">
-        <h2>1. 局所排気フードサイズと風量の計算</h2>
-        <div class="input-group">熱源の幅 (m): <input type="number" id="hood-w" value="1.95" step="0.01" oninput="calcHood()"></div>
-        <div class="input-group">熱源の奥行き (m): <input type="number" id="hood-d" value="1.65" step="0.01" oninput="calcHood()"></div>
-        <div class="input-group">熱源からフード下端の高さ (m): <input type="number" id="hood-h" value="0.5" step="0.1" oninput="calcHood()"></div>
-        <div class="input-group">設定面風速 (m/s): 
+        <h2>1. フードサイズと必要風量</h2>
+        <div class="input-group">熱源の幅 <span class="unit">(m)</span>: <input type="number" id="hood-w" value="0" step="0.01" oninput="calcHood()"></div>
+        <div class="input-group">熱源の奥行き <span class="unit">(m)</span>: <input type="number" id="hood-d" value="0" step="0.01" oninput="calcHood()"></div>
+        <div class="input-group">フードの高さ(H) <span class="unit">(m)</span>: <input type="number" id="hood-h" value="0" step="0.1" oninput="calcHood()"></div>
+        <div class="input-group">設定面風速 <span class="unit">(m/s)</span>: 
             <select id="hood-v" onchange="calcHood()">
                 <option value="0.3">0.3 (弱)</option>
-                <option value="0.5" selected>0.5 (標準・熱気)</option>
+                <option value="0.5" selected>0.5 (標準)</option>
                 <option value="0.8">0.8 (強)</option>
             </select>
         </div>
         <div class="result-box">
-            推奨開口サイズ: <span id="res-hood-size">---</span><br>
-            必要排気風量: 約 <span id="res-hood-q" style="font-size: 1.5em; color: #d9534f;">---</span> m&sup3;/min
+            推奨フードサイズ: <span id="res-hood-size">0.00 x 0.00</span> m<br>
+            必要風量: <span id="res-hood-q" style="font-size: 1.4em; color: #d9534f;">0</span> m&sup3;/min
         </div>
     </div>
 
     <div class="card">
-        <h2>2. ダクト圧力損失と風速の計算</h2>
-        <div class="input-group">排気風量 (m&sup3;/min): <input type="number" id="duct-q" value="150" oninput="calcDuct()"></div>
-        <div class="input-group">ダクト直管長さ (m): <input type="number" id="duct-l" value="6" oninput="calcDuct()"></div>
-        <div class="input-group">エルボ(曲がり)数: <input type="number" id="duct-elb" value="1" oninput="calcDuct()"></div>
+        <h2>2. ダクト内風速と必要静圧</h2>
+        <div class="input-group">排気風量 <span class="unit">(m&sup3;/min)</span>: <input type="number" id="duct-q" value="0" oninput="calcDuct()"></div>
+        <div class="input-group">ダクト直管長さ <span class="unit">(m)</span>: <input type="number" id="duct-l" value="0" oninput="calcDuct()"></div>
+        <div class="input-group">エルボ(曲がり)数 <span class="unit">(個)</span>: <input type="number" id="duct-elb" value="0" oninput="calcDuct()"></div>
         
         <div class="input-group">
             ダクト形状:
@@ -58,108 +60,95 @@
         </div>
 
         <div id="round-inputs">
-            <div class="input-group">口径 (mm): <input type="number" id="duct-dia" value="450" step="10" oninput="calcDuct()"></div>
+            <div class="input-group">口径 <span class="unit">(mm)</span>: <input type="number" id="duct-dia" value="0" step="10" oninput="calcDuct()"></div>
         </div>
 
         <div id="square-inputs" style="display:none;">
-            <div class="input-group">幅 (mm): <input type="number" id="duct-sw" value="500" step="10" oninput="calcDuct()"></div>
-            <div class="input-group">高さ (mm): <input type="number" id="duct-sh" value="400" step="10" oninput="calcDuct()"></div>
+            <div class="input-group">幅 <span class="unit">(mm)</span>: <input type="number" id="duct-sw" value="0" step="10" oninput="calcDuct()"></div>
+            <div class="input-group">高さ <span class="unit">(mm)</span>: <input type="number" id="duct-sh" value="0" step="10" oninput="calcDuct()"></div>
         </div>
 
         <div class="result-box">
-            管内風速: <span id="res-vel">---</span> m/s <br>
-            <span class="note">※熱気排気の適正風速は 10〜15 m/s</span><br><br>
-            必要静圧(ファン選定用): 約 <span id="res-pa" style="font-size: 1.5em; color: #d9534f;">---</span> Pa
+            管内風速: <span id="res-vel">0.0</span> m/s 
+            <span class="note">※熱気:10〜15m/s | 厨房:8〜12m/s</span>
+            必要静圧: <span id="res-pa" style="font-size: 1.4em; color: #d9534f;">0</span> Pa
         </div>
     </div>
 </div>
 
 <script>
-    // 起動時に初回計算を実行
-    window.onload = function() {
-        calcHood();
-        calcDuct();
-    };
-
     function calcHood() {
-        let w = parseFloat(document.getElementById('hood-w').value);
-        let d = parseFloat(document.getElementById('hood-d').value);
-        let h = parseFloat(document.getElementById('hood-h').value);
-        let v = parseFloat(document.getElementById('hood-v').value);
-
-        if(!w || !d || !h) return;
+        let w = parseFloat(document.getElementById('hood-w').value) || 0;
+        let d = parseFloat(document.getElementById('hood-d').value) || 0;
+        let h = parseFloat(document.getElementById('hood-h').value) || 0;
+        let v = parseFloat(document.getElementById('hood-v').value) || 0;
 
         let overhang = h * 0.4;
         let hoodW = w + (overhang * 2);
         let hoodD = d + (overhang * 2);
         let area = hoodW * hoodD;
-        let q_hour = area * v * 3600;
-        let q_min = q_hour / 60;
+        let q_min = (area * v * 3600) / 60;
 
-        document.getElementById('res-hood-size').innerText = hoodW.toFixed(2) + " m × " + hoodD.toFixed(2) + " m";
-        document.getElementById('res-hood-q').innerText = q_min.toFixed(0);
-        // ダクト計算の風量にも反映させる（連動）
-        document.getElementById('duct-q').value = q_min.toFixed(0);
+        document.getElementById('res-hood-size').innerText = hoodW.toFixed(2) + " x " + hoodD.toFixed(2);
+        document.getElementById('res-hood-q').innerText = Math.round(q_min);
+        
+        // 風量を下の計算にも自動反映
+        document.getElementById('duct-q').value = Math.round(q_min);
         calcDuct();
     }
 
     function toggleDuctType() {
         let type = document.getElementById('duct-type').value;
-        if(type === 'round') {
-            document.getElementById('round-inputs').style.display = 'block';
-            document.getElementById('square-inputs').style.display = 'none';
-        } else {
-            document.getElementById('round-inputs').style.display = 'none';
-            document.getElementById('square-inputs').style.display = 'block';
-        }
+        document.getElementById('round-inputs').style.display = (type === 'round') ? 'block' : 'none';
+        document.getElementById('square-inputs').style.display = (type === 'square') ? 'block' : 'none';
     }
 
     function calcDuct() {
-        let q_min = parseFloat(document.getElementById('duct-q').value);
-        let length = parseFloat(document.getElementById('duct-l').value);
-        let elb = parseFloat(document.getElementById('duct-elb').value);
+        let q_min = parseFloat(document.getElementById('duct-q').value) || 0;
+        let length = parseFloat(document.getElementById('duct-l').value) || 0;
+        let elb = parseFloat(document.getElementById('duct-elb').value) || 0;
         let type = document.getElementById('duct-type').value;
 
-        if(!q_min) return;
-
-        let area_m2, de_m;
+        let area_m2 = 0, de_m = 0;
 
         if(type === 'round') {
-            let dia = parseFloat(document.getElementById('duct-dia').value);
-            if(!dia) return;
-            de_m = dia / 1000;
-            area_m2 = Math.PI * Math.pow(de_m / 2, 2);
+            let dia = parseFloat(document.getElementById('duct-dia').value) || 0;
+            if(dia > 0) {
+                de_m = dia / 1000;
+                area_m2 = Math.PI * Math.pow(de_m / 2, 2);
+            }
         } else {
-            let sw = parseFloat(document.getElementById('duct-sw').value) / 1000;
-            let sh = parseFloat(document.getElementById('duct-sh').value) / 1000;
-            if(!sw || !sh) return;
-            area_m2 = sw * sh;
-            de_m = (2 * sw * sh) / (sw + sh);
+            let sw = parseFloat(document.getElementById('duct-sw').value) || 0;
+            let sh = parseFloat(document.getElementById('duct-sh').value) || 0;
+            if(sw > 0 && sh > 0) {
+                sw /= 1000; sh /= 1000;
+                area_m2 = sw * sh;
+                de_m = (2 * sw * sh) / (sw + sh);
+            }
         }
 
-        let q_sec = q_min / 60;
-        let vel = q_sec / area_m2;
+        let vel = (area_m2 > 0) ? (q_min / 60) / area_m2 : 0;
         document.getElementById('res-vel').innerText = vel.toFixed(1);
 
-        let pd = 0.5 * 1.2 * Math.pow(vel, 2);
-        let pipeLoss = 0.02 * (length / de_m) * pd;
-        let elbLoss = elb * 0.4 * pd;
-        let extraLoss = 1.5 * pd; 
-        
-        let totalPa = (pipeLoss + elbLoss + extraLoss) * 1.2; 
-
-        document.getElementById('res-pa').innerText = totalPa.toFixed(0);
+        if(vel > 0 && de_m > 0) {
+            let pd = 0.5 * 1.2 * Math.pow(vel, 2);
+            let pipeLoss = 0.02 * (length / de_m) * pd;
+            let elbLoss = elb * 0.4 * pd;
+            let totalPa = (pipeLoss + elbLoss + (1.5 * pd)) * 1.2;
+            document.getElementById('res-pa').innerText = Math.round(totalPa);
+        } else {
+            document.getElementById('res-pa').innerText = "0";
+        }
     }
+
+    // 初回計算
+    window.onload = function() { calcHood(); };
 </script>
 
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-            navigator.serviceWorker.register('sw.js').then(function(registration) {
-                console.log('ServiceWorker registration successful');
-            }, function(err) {
-                console.log('ServiceWorker registration failed: ', err);
-            });
+            navigator.serviceWorker.register('sw.js');
         });
     }
 </script>
